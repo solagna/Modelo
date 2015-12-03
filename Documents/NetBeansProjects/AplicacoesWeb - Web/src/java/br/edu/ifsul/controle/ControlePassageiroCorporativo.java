@@ -7,10 +7,7 @@ package br.edu.ifsul.controle;
 
 import br.edu.ifsul.dao.AssentoDAO;
 import br.edu.ifsul.dao.CorporativoDAO;
-import br.edu.ifsul.dao.VarejoDAO;
-import br.edu.ifsul.modelo.Assento;
 import br.edu.ifsul.modelo.PassageiroCorporativo;
-import br.edu.ifsul.modelo.PassageiroVarejo;
 import br.edu.ifsul.modelo.Reserva;
 import br.edu.ifsul.util.Util;
 import javax.faces.bean.ManagedBean;
