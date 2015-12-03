@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">CONTROLE DE RESERVAS</ui:define>
+        <ui:define name="conteudo">
+            <h:form id="formListagem" prependId="false">
+                <p:growl/>
+                <p:commandButton actionListener="#{controleAssento.novo()}" 
+                                 value="Novo" 
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                
+                <p:dataTable value="#{controleAssento.dao.listarTodos}" var="obj">
+                    <f:facet name="header">
+                        <p:outputLabel value="Listagem de Assentos"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <p:outputLabel value="Total de registros: #{controleAssento.dao.listarTodos.size()}"/> 
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Preço">
+                        <p:outputLabel value="#{obj.preco}"/>
+                    </p:column>
+                    <p:column headerText="Tipo">
+                        <p:outputLabel value="#{obj.tipo}"/>
+                    </p:column>
+                    <p:column headerText="Status">
+                        <p:outputLabel value="#{obj.status}"/>
+                    </p:column>
+                    <p:column headerText="Voo">
+                        <p:outputLabel value="#{obj.voo.id}"/>
+                    </p:column>
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton icon="ui-icon-pencil" 
+                                             actionListener="#{controleAssento.editar(obj.id)}"
+                                             oncomplete="PF('dlg').show();"
+                                             update=":formEdicao"
+                                             process="@form"
+                                             id="btnAlterar"/>
+                            <p:commandButton icon="ui-icon-trash"
+                                             actionListener="#{controleAssento.remover(obj.id)}"
+                                             onclick="if (!confirm('Confirma a exclusão do objeto?'))
+                                                         return false"
+                                             update=":formListagem"
+                                             id="btnExcluir"/>
+                        </div>
+                        <p:tooltip for="btnAlterar" value="Alterar"/>
+                        <p:tooltip for="btnExcluir" value="Excluir"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <p:dialog header="Edição" widgetVar="dlg" resizable="false" modal="true">
+                <h:form id="formEdicao" prependId="false">
+                    <p:growl/>
+                    <p:panelGrid columns="4">
+                        <f:facet name="header">
+                            <p:outputLabel value="Edição de Assento"/>
+                        </f:facet>
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                                 update=":formListagem :formEdicao"
+                                                 actionListener="#{controleAssento.salvar()}"
+                                                 oncomplete="if(!args.validationFailed){PF('dlg').hide();}"/>
+                            </div>
+                        </f:facet>
+                        <p:outputLabel value="ID" for="txtID"/>
+                        <p:inputText value="#{controleAssento.objeto.id}" size="5" readonly="true" id="txtID"/>
+                        <p:outputLabel value="Status" for="txtStatus"/>
+                        <h:panelGrid columns="3">
+                            <p:outputLabel for="txtStatus" value="Status:" />
+                            <p:selectOneMenu id="txtStatus" value="#{controleAssento.objeto.status}">
+                                <f:selectItem  itemLabel="Livre" itemValue="true" />
+                                <f:selectItem itemLabel="Ocupado" itemValue="false" />
+                            </p:selectOneMenu>
+                        </h:panelGrid>
+                        <p:outputLabel value="Preco" for="txtPreco"/>
+                        <p:inputText value="#{controleAssento.objeto.preco}" size="10" maxlength="10" id="txtPreco"
+                                     onkeydown="Mascara(this, Valor);"
+                                     onkeyup="Mascara(this, Valor);"
+                                     onkeypress="Mascara(this, Valor);"
+                                     placeholder="Obrigatório"/>
+
+                        <p:outputLabel value="Tipo" for="txtTipo"/>
+                        <p:selectOneMenu value="#{controleAssento.objeto.tipo}" id="txtTipo">
+                            <f:selectItem noSelectionOption="true" itemLabel="Selecione um registro"/>
+                            <f:selectItem itemValue="Normal"  itemLabel="Normal"/>
+                            <f:selectItem itemValue="Maior espaço"  itemLabel="Mais espaço"/>
+                        </p:selectOneMenu>
+                        <p:outputLabel value="Voo" for="selectVoo"/>
+                        <p:selectOneMenu value="#{controleAssento.objeto.voo}" id="selectVoo">
+                            <f:converter converterId="converterVoo"/>
+                            <f:selectItem noSelectionOption="true" itemLabel="Selecione um registro"/>
+                            <f:selectItems value="#{controleAssento.vooDAO.listarTodos}" 
+                                           var="f" itemLabel="#{f.id}"/>
+                        </p:selectOneMenu>
+                    </p:panelGrid>
+
+                </h:form>
+            </p:dialog>
+        </ui:define>        
+    </ui:composition>
+</html>
+
+
+

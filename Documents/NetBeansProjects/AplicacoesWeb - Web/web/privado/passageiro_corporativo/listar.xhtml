@@ -1,0 +1,226 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/templates/template.xhtml">
+             <ui:define name="titulo">CONTROLE DE RESERVAS</ui:define>
+        <!--Conteúdo-->
+        <ui:define name="conteudo">
+            <h:form id="formListagem" prependId="false">
+                <p:growl/>
+                <p:commandButton actionListener="#{controlePassageiroCorporativo.novo()}" 
+                                 value="Novo" 
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                <p:dataTable value="#{controlePassageiroCorporativo.dao.listarTodos}" var="obj">
+                    <f:facet name="header">
+                        <p:outputLabel value="Listagem de Passageiros"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <p:outputLabel value="Total de registros: #{controlePassageiroCorporativo.dao.listarTodos.size()}"/> 
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <p:outputLabel value="#{obj.nome}"/>
+                    </p:column>
+                    <p:column headerText="Email">
+                        <p:outputLabel value="#{obj.email}"/>
+                    </p:column>
+                    <p:column headerText="Endereço">
+                        <p:outputLabel value="#{obj.endereco}"/>
+                    </p:column>
+                    <p:column headerText="CEP">
+                        <p:outputLabel value="#{obj.cep}"/>
+                    </p:column>  
+                    <p:column headerText="Data Nascimento">
+                        <p:outputLabel value="#{obj.dataNascimento}">
+                            <f:converter converterId="converterCalendar"/>
+                        </p:outputLabel>
+                    </p:column>
+                    <p:column headerText="Nome Empresa">
+                        <p:outputLabel value="#{obj.nomeEmpresa}"/>
+                    </p:column>
+                    <p:column headerText="Numero Conta">
+                        <p:outputLabel value="#{obj.numeroConta}"/>
+                    </p:column>
+                    <p:column headerText="Pontos">
+                        <p:outputLabel value="#{obj.pontosVoo}"/>
+                    </p:column>
+
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton icon="ui-icon-pencil" 
+                                             actionListener="#{controlePassageiroCorporativo.editar(obj.id)}"
+                                             oncomplete="PF('dlg').show();"
+                                             update=":formEdicao"
+                                             process="@form"
+                                             id="btnAlterar"/>
+                            <p:commandButton icon="ui-icon-trash"
+                                             actionListener="#{controlecontrolePassageiroCorporativo.remover(obj.id)}"
+                                             onclick="if (!confirm('Confirma a exclusão do objeto?'))
+                                                         return false"
+                                             update=":formListagem"
+                                             id="btnExcluir"/>
+                        </div>
+                        <p:tooltip for="btnAlterar" value="Alterar"/>
+                        <p:tooltip for="btnExcluir" value="Excluir"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <!--Edição dados Principais-->
+            <p:dialog header="Edição" widgetVar="dlg" 
+                      resizable="false" modal="true" width="580" height="500">
+                <h:form id="formEdicao" prependId="false">
+                    <p:growl id="growl"/>
+                    <!-- Edição dos Dados Principais -->
+                    <p:tabView id="tab">
+                        <p:tab title="Dados Principais">
+                            <div align="center">
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="Edição de Passageiro"/>
+                                    </f:facet>
+                                    <f:facet name="footer">
+                                        <div align="center">
+                                            <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                                             update=":formListagem :formEdicao"
+                                                             actionListener="#{controlePassageiroCorporativo.salvar()}"
+                                                             oncomplete="if(!args.validationFailed){PF('dlg').hide();}"/>
+                                        </div>
+                                    </f:facet>
+                                    <p:outputLabel value="ID" for="txtID"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.id}" size="5" readonly="true" id="txtID"/>
+                                    <p:outputLabel value="Nome" for="txtNome"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.nome}" size="50" maxlength="50" id="txtNome" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Endereço" for="txtEndereco"/>
+                                    <p:inputText value="#{controlePPassageiroCorporativo.objeto.endereco}" size="50" maxlength="50" id="txtEndereco" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Email" for="txtEmail"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.email}" size="50" maxlength="50" id="txtEmail" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Nascimento" for="txtNascimento"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.dataNascimento}" size="50" maxlength="50" id="txtNascimento" 
+                                                 onkeydown="Mascara(this, Data);"
+                                                 onkeyup="Mascara(this, Data);"
+                                                 onkeypress="Mascara(this, Data);"
+                                                 placeholder="Obrigatório">
+                                        <f:converter converterId="converterCalendar"/>
+                                    </p:inputText>
+                                    <p:outputLabel value="CEP" for="txtCep"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.cep}" size="50" maxlength="50" id="txtCep" 
+                                                 onkeydown="Mascara(this, Cep);"
+                                                 onkeyup="Mascara(this, Cep);"
+                                                 onkeypress="Mascara(this, Cep);"
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Nome Empresa" for="txtNEmpresa"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.nomeEmpresa}" size="50" maxlength="50" id="txtNEmpresa" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Numero Conta" for="txtNConta"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.numeroConta}" size="50" maxlength="50" id="txtNConta" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Pontos" for="txtPVoo"/>
+                                    <p:inputText value="#{controlePassageiroCorporativo.objeto.pontosVoo}" maxlength="50" id="txtPVoo" 
+                                                 size="50" placeholder="Obrigatório"/>
+                                </p:panelGrid>
+                            </div>
+                        </p:tab>
+                        <!--Reservas-->
+                        <p:tab title="Reservas">
+                            <p:dataTable value="#{controlePassageiroCorporativo.objeto.reservas}" 
+                                         var="tel" rowIndexVar="idx" id="listaReservas">
+                                <f:facet name="header">
+                                    <p:commandButton value="Nova Reserva" 
+                                                     actionListener="#{controlePassageiroCorporativo.novaReserva()}"
+                                                     update=":formReserva"
+                                                     process="btnNovaReserva"
+                                                     id="btnNovaReserva"
+                                                     oncomplete="PF('dlgReserva').show();"/>
+                                </f:facet>
+                                <p:column headerText="Data">
+                                    <p:outputLabel value="#{tel.data}">
+                                        <f:converter converterId="converterCalendar"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Validade">
+                                    <p:outputLabel value="#{tel.validade}">
+                                        <f:converter converterId="converterCalendar"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Assento">
+                                    <p:outputLabel value="#{tel.assento.id}">
+                                        <f:converter converterId="converterAssento"/>
+                                    </p:outputLabel>
+                                </p:column>
+                                <p:column headerText="Ações">
+                                    <div align="center">
+                                        <p:commandButton id="btnAlterarReserva" 
+                                                         icon="ui-icon-pencil"
+                                                         update=":formReserva"
+                                                         process="btnAlterarReserva"
+                                                         actionListener="#{controlePassageiroCorporativo.alterarReserva(idx)}"
+                                                         oncomplete="PF('dlgReserva').show();"/>
+
+                                        <p:commandButton id="btnRemoverReserva"
+                                                         icon="ui-icon-trash"
+                                                         actionListener="#{controlePassageiroCorporativo.removerReserva(idx)}"
+                                                         process="btnRemoverReserva"
+                                                         update="listaReservas :formEdicao:growl"                                                         onclick="if (!confirm('Confirma a exclusão ?'))
+                                                                     return false"/>
+                                    </div>
+                                </p:column>
+                            </p:dataTable>
+                        </p:tab>
+                    </p:tabView>
+                </h:form>
+            </p:dialog>
+            <p:dialog header="Edição de Reservas" widgetVar="dlgReserva" resizable="false"
+                      modal="true" >
+                <h:form id="formReserva">
+                    <p:panelGrid columns="2">
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:commandButton id="btnAdicionarReserva"
+                                                 value="salvar" icon="ui-icon-disk"
+                                                 actionListener="#{controlePassageiroVarejo.salvarReserva()}"
+                                                 update=":formReserva :formEdicao:tab:listaReservas"
+                                                 process="btnAdicionarReserva txtDt txtVl txtAssento"
+                                                 oncomplete="if(!args.validationFailed){PF('dlgReserva').hide();}"/>
+                            </div>
+                        </f:facet>
+                        <p:outputLabel value="Data" for="txtDt"/>
+                        <p:inputText value="#{controleCorporativo.reserva.data}" size="50" maxlength="50" id="txtDt" 
+                                     onkeydown="Mascara(this, Data);"
+                                     onkeyup="Mascara(this, Data);"
+                                     onkeypress="Mascara(this, Data);"
+                                     placeholder="Obrigatório">
+                            <f:converter converterId="converterCalendar"/>
+                        </p:inputText>
+
+                        <p:outputLabel value="Validade" for="txtVl"/>
+                        <p:inputText value="#{controlePassageiroCorporativo.reserva.validade}" size="50" maxlength="50" id="txtVl" 
+                                     onkeydown="Mascara(this, Data);"
+                                     onkeyup="Mascara(this, Data);"
+                                     onkeypress="Mascara(this, Data);"
+                                     placeholder="Obrigatório">
+                            <f:converter converterId="converterCalendar"/>
+                        </p:inputText>
+                        <p:outputLabel value="Assento" for="txtAssento"/>
+                        <p:inputText value="#{controlePassageiroCorporativo.reserva.assento}"
+                                     id="txtAssento" size="30" maxlength="30">
+                            <f:converter converterId="converterAssento"/>
+                        </p:inputText>
+                    </p:panelGrid>
+                </h:form>
+            </p:dialog>
+        </ui:define>        
+    </ui:composition>
+</html>
