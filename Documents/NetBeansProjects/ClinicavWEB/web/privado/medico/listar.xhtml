@@ -1,0 +1,132 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">Sistema com JSF 2 e JPA</ui:define>
+
+        <ui:define name="conteudo">
+            <h:form id="formListagem" prependId="false">
+                <p:growl/>
+                <p:commandButton actionListener="#{controleMedico.novo()}" 
+                                 value="Novo Médico" icon="ui-icon-plus"
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                <p:dataTable value="#{controleMedico.dao.listarTodos}" var="obj">
+                    <f:facet name="header">
+                        <p:outputLabel value="Listagem de Medicos"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <p:outputLabel value="Total de registros: #{controleMedico.dao.listarTodos.size()}"/> 
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <p:outputLabel value="#{obj.nome}"/>
+                    </p:column>
+                    <p:column headerText="Cidade">
+                        <p:outputLabel value="#{obj.cidade}"/>
+                    </p:column>
+                    <p:column headerText="Endereço">
+                        <p:outputLabel value="#{obj.endereco}"/>
+                    </p:column>
+                    <p:column headerText="Email">
+                        <p:outputLabel value="#{obj.email}"/>
+                    </p:column>
+                    <p:column headerText="CRM">
+                        <p:outputLabel value="#{obj.crm}"/>
+                    </p:column>
+                    <p:column headerText="Carga Horaria">
+                        <p:outputLabel value="#{obj.cargaHoraria}"/>
+                    </p:column>
+                    <p:column headerText="Especialidade">
+                        <p:outputLabel value="#{obj.especialidade}"/>
+                    </p:column>
+                    <p:column headerText="Folga">
+                        <p:outputLabel value="#{obj.folga}"/>
+                    </p:column>
+
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton icon="ui-icon-pencil" 
+                                             actionListener="#{controleMedico.editar(obj.id)}"
+                                             oncomplete="PF('dlg').show();"
+                                             update=":formEdicao"
+                                             process="@form"
+                                             id="btnAlterar"/>
+                            <p:commandButton icon="ui-icon-trash"
+                                             actionListener="#{controleMedico.remover(obj.id)}"
+                                             onclick="if (!confirm('Confirma a exclusÃ£o do objeto?'))
+                                                         return false"
+                                             update=":formListagem"
+                                             id="btnExcluir"/>
+                        </div>
+                        <p:tooltip for="btnAlterar" value="Alterar"/>
+                        <p:tooltip for="btnExcluir" value="Excluir"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <!--Edição dados Principais-->
+            <p:dialog header="Edição" widgetVar="dlg" 
+                      resizable="false" modal="true" width="580" height="500">
+                <h:form id="formEdicao" prependId="false">
+                    <p:growl id="growl"/>
+                    <!-- Edição dos Dados Principais -->
+                    <p:tabView id="tab">
+                        <p:tab title="Dados Principais">
+                            <div align="center">
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="Edição de Medicos"/>
+                                    </f:facet>
+                                    <f:facet name="footer">
+                                        <div align="center">
+                                            <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                                             update=":formListagem :formEdicao"
+                                                             actionListener="#{controleMedico.salvar()}"
+                                                             oncomplete="if(!args.validationFailed){PF('dlg').hide();}"/>
+                                        </div>
+                                    </f:facet>
+                                    <p:outputLabel value="ID" for="txtID"/>
+                                    <p:inputText value="#{controleMedico.objeto.id}" size="5" readonly="true" id="txtID"/>
+                                    <p:outputLabel value="Nome" for="txtNome"/>
+                                    <p:inputText value="#{controleMedico.objeto.nome}" size="50" maxlength="50" id="txtNome" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Endereço" for="txtEndereco"/>
+                                    <p:inputText value="#{controleMedico.objeto.endereco}" size="50" maxlength="50" id="txtEndereco" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Email" for="txtEmail"/>
+                                    <p:inputText value="#{controleMedico.objeto.email}" size="50" maxlength="50" id="txtEmail" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Cidade" for="txtCidade"/>
+                                    <p:inputText value="#{controleMedico.objeto.cidade}" size="50" maxlength="50" id="txtCidade" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="CRM" for="txtCRM"/>
+                                    <p:inputText value="#{controleMedico.objeto.crm}" size="50" maxlength="50" id="txtCRM" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Carga Horaria" for="txtCG"/>
+                                    <p:inputText value="#{controleMedico.objeto.cargaHoraria}" size="50" maxlength="50" id="txtCG" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Folga" for="txtFolga"/>
+                                    <p:inputText value="#{controleMedico.objeto.folga}" size="50" maxlength="50" id="txtFolga" 
+                                                 placeholder="Obrigatório"/>
+                                     <p:outputLabel value="Especialidade" for="txtEsp"/>
+                                     <p:inputText value="#{controleMedico.objeto.especialidade}" size="50" maxlength="50" id="txtEsp" 
+                                                 placeholder="Obrigatório"/>
+                                </p:panelGrid>
+                            </div>
+                        </p:tab>                      
+                    </p:tabView>
+                </h:form>
+            </p:dialog>
+
+        </ui:define>        
+    </ui:composition>
+</html>

@@ -1,0 +1,86 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">Listagem de telefones.</ui:define> 
+        <ui:define  name="conteudo" >
+            <h:form id="formListagem" prependId="false">
+                <p:growl/>
+                <p:commandButton style="text-align: left" actionListener="#{controleTelefone.novo()}"                
+                                 value="Novo Telefone" icon="ui-icon-plus"
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                <p:dataTable value="#{controleTelefone.dao.listarTodos}" var="obj">
+                    <f:facet name="header">
+                        <p:outputLabel value="Listagem de Telefones."/>
+                </f:facet>
+                <p:column  headerText="ID">
+                    <p:outputLabel style="text-align: center" value="#{obj.id}"/>
+                </p:column>
+                <p:column headerText="Descriçao">
+                    <p:outputLabel value="#{obj.descricao}"/>
+                </p:column>
+                <p:column headerText="Numero">
+                    <p:outputLabel value="#{obj.numero}"/>
+                </p:column>
+               
+                <p:column headerText="Ações">
+                    <div align="center">
+                        <p:commandButton actionListener="#{controleTelefone.editar(obj.id)}"
+                                         icon = "ui-icon-pencil"
+                                         update=":formEdicao"
+                                         process="@form"
+                                         oncomplete="PF('dlg').show();"
+                                         id="btnAlterar"/>
+                        <p:commandButton actionListener="#{controleTelefone.remover(obj.id)}"
+                                         icon = "ui-icon-trash"
+                                         update="@form"
+                                         process="@form"
+                                         id="btnExcluir"
+                                         onclick="if (!confirm('Confirma a exclusÃ£o?'))
+                                                     return false"/>
+                    </div>
+                </p:column>
+            </p:dataTable>
+        </h:form>
+    </ui:define>
+        
+    <ui:define name="dialogos">
+        <p:dialog widgetVar="dlg" header="Edição" resizable="false" modal="true">
+            <h:form id="formEdicao" prependId="false">
+                <p:growl/>
+                <div align="center">
+                    <p:panelGrid columns="2">
+                        <f:facet name="footer">
+                            <div align="center">
+                                <p:commandButton value="Salvar"
+                                                 icon="ui-icon-disk"
+                                                 actionListener="#{controleTelefone.salvar()}"
+                                                 update=":formEdicao :formListagem"
+                                                 oncomplete="if(!args.validationFailed) {PF('dlg').hide();}"/>
+                            </div>
+                        </f:facet>
+                        <p:outputLabel value="ID"/>
+                        <p:inputText value="#{controleTelefone.objeto.id}" readonly="true"
+                                     size="10"/>
+                         <p:outputLabel value="Numero" for="txtNum"/>
+                         <p:inputText value="#{controleTelefone.objeto.numero}" 
+                                     size="40" maxlength="40" id="txtNum"/>
+                        
+                        <p:outputLabel value="Descrição" for="txtDesc"/>
+                        <p:inputText value="#{controleTelefone.objeto.descricao}" 
+                                     size="40" maxlength="40" id="txtDesc"/>
+                                               
+                </p:panelGrid>
+            </div>
+        </h:form>
+            <ui:include src="/templates/ajaxstatus.xhtml"/>
+    </p:dialog>
+</ui:define>
+</ui:composition>
+</html>
+

@@ -1,0 +1,108 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+    <ui:composition template="/templates/template.xhtml">
+        <ui:define name="titulo">Sistema com JSF 2 e JPA</ui:define>
+
+        <ui:define name="conteudo">
+            <h:form id="formListagem" prependId="false">
+                <p:growl/>
+                <p:commandButton actionListener="#{controleMedicamento.novo()}" 
+                                 value="Novo Medicamento" icon="ui-icon-plus" 
+                                 oncomplete="PF('dlg').show();"
+                                 update=":formEdicao"/>
+                <p:dataTable value="#{controleMedicamento.dao.listarTodos}" var="obj">
+                    <f:facet name="header">
+                        <p:outputLabel value="Listagem de Medicamentos"/>
+                    </f:facet>
+                    <f:facet name="footer">
+                        <p:outputLabel value="Total de registros: #{controleMedicamento.dao.listarTodos.size()}"/> 
+                    </f:facet>
+                    <p:column headerText="ID">
+                        <p:outputLabel value="#{obj.id}"/>
+                    </p:column>
+                    <p:column headerText="Nome">
+                        <p:outputLabel value="#{obj.nome}"/>
+                    </p:column>
+                    <p:column headerText="Descrição">
+                        <p:outputLabel value="#{obj.descricao}"/>
+                    </p:column>
+                    <p:column headerText="Valor Unitario">
+                        <p:outputLabel value="#{obj.preco}"/>
+                    </p:column>
+                    <p:column headerText="Qnt. Estoque">
+                        <p:outputLabel value="#{obj.estoque}"/>
+                    </p:column>
+
+                    <p:column headerText="Ações">
+                        <div align="center">
+                            <p:commandButton icon="ui-icon-pencil" 
+                                             actionListener="#{controleMedicamento.editar(obj.id)}"
+                                             oncomplete="PF('dlg').show();"
+                                             update=":formEdicao"
+                                             process="@form"
+                                             id="btnAlterar"/>
+                            <p:commandButton icon="ui-icon-trash"
+                                             actionListener="#{controleMedicamento.remover(obj.id)}"
+                                             onclick="if (!confirm('Confirma a exclusão do objeto?'))
+                                                         return false"
+                                             update=":formListagem"
+                                             id="btnExcluir"/>
+                        </div>
+                        <p:tooltip for="btnAlterar" value="Alterar"/>
+                        <p:tooltip for="btnExcluir" value="Excluir"/>
+                    </p:column>
+                </p:dataTable>
+            </h:form>
+        </ui:define>
+        <ui:define name="dialogos">
+            <!--Ediçãoo dados Principais-->
+            <p:dialog header="Edição" widgetVar="dlg" 
+                      resizable="false" modal="true" width="580" height="500">
+                <h:form id="formEdicao" prependId="false">
+                    <p:growl id="growl"/>
+                    <!-- Ediçãoo dos Dados Principais -->
+                    <p:tabView id="tab">
+                        <p:tab title="Dados Principais">
+                            <div align="center">
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        <p:outputLabel value="Edição de Medicamentos"/>
+                                    </f:facet>
+                                    <f:facet name="footer">
+                                        <div align="center">
+                                            <p:commandButton value="Salvar" icon="ui-icon-disk"
+                                                             update=":formListagem :formEdicao"
+                                                             actionListener="#{controleMedicamento.salvar()}"
+                                                             oncomplete="if(!args.validationFailed){PF('dlg').hide();}"/>
+                                        </div>
+                                    </f:facet>
+                                    <p:outputLabel value="ID" for="txtID"/>
+                                    <p:inputText value="#{controleMedicamento.objeto.id}" size="5" readonly="true" id="txtID"/>
+                                    <p:outputLabel value="Nome" for="txtNome"/>
+                                    <p:inputText value="#{controleMedicamento.objeto.nome}" size="50" maxlength="50" id="txtNome" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Descrição" for="txtDesc"/>
+                                    <p:inputText value="#{controleMedicamento.objeto.descricao}" size="50" maxlength="50" id="txtDesc" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Valor Unitario" for="txtVal"/>
+                                    <p:inputText value="#{controleMedicamento.objeto.preco}" size="50" maxlength="50" id="txtVal" 
+                                                 placeholder="Obrigatório"/>
+                                    <p:outputLabel value="Qnt. Estoque" for="txtEstoque"/>
+                                    <p:inputText value="#{controleMedicamento.objeto.estoque}" size="50" maxlength="50" id="txtEstoque" 
+                                                 placeholder="Obrigatório"/>
+                                </p:panelGrid>
+                            </div>
+                        </p:tab>
+                        <!--Telefones-->  
+                    </p:tabView>
+                </h:form>
+            </p:dialog>
+        </ui:define>        
+    </ui:composition>
+</html>
